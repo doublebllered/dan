@@ -1,0 +1,8 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {starter,validState,weekKey,shiftDay,planDay,toggleRoutine} from '../model.js';
+test('starter data is valid and fresh, with no invented progress',()=>{const s=starter('2026-10-24');assert.ok(validState(s));assert.equal(s.goals[0].week,'2026-10-19');assert.deepEqual(s.days,{});assert.deepEqual(s.sessions,[]);assert.ok(s.phases.every(p=>p.items.every(i=>!i.done)));});
+test('weeks start Monday and cross years correctly',()=>{assert.equal(weekKey('2026-10-25'),'2026-10-19');assert.equal(weekKey('2026-10-26'),'2026-10-26');assert.equal(weekKey('2027-01-01'),'2026-12-28');});
+test('calendar arithmetic crosses daylight-saving and month boundaries',()=>{assert.equal(shiftDay('2026-10-24',2),'2026-10-26');assert.equal(shiftDay('2026-12-31',1),'2027-01-01');assert.equal(planDay('2026-10-24','2027-01-21'),90);});
+test('daily check-ins toggle independently and retain history',()=>{const s=starter('2026-10-24');toggleRoutine(s,'r1','2026-10-24');toggleRoutine(s,'r2','2026-10-25');assert.deepEqual(s.days['2026-10-24'].completed,['r1']);toggleRoutine(s,'r2','2026-10-25');assert.deepEqual(s.days['2026-10-25'].completed,[]);assert.ok(validState(JSON.parse(JSON.stringify(s))));});
+test('backup validation rejects malformed data',()=>{assert.equal(validState(null),false);const s=starter();s.sessions=[{id:'x',title:'test',date:'2026-10-24',minutes:-1}];assert.equal(validState(s),false);assert.equal(validState({...starter(),phases:[]}),false);assert.equal(validState({...starter(),days:{bad:{completed:[],total:0}}}),false);});

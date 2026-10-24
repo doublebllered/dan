@@ -1,0 +1,9 @@
+{
+  "name": "dan-personal-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A simple personal dashboard for daily routines, weekly goals and a 90-day direction.",
+  "scripts": { "start": "node server.js", "test": "node --test tests/model.test.js" },
+  "engines": { "node": ">=20" }
+}
